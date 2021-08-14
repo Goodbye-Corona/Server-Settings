@@ -1,0 +1,47 @@
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+  
+	root /var/www/html;
+	index index.html;
+
+	server_name _;
+  server_tokens off;
+  access_log /var/log/nginx/access.log Combined;
+
+	location / {
+    limit_except GET POST {
+      deny all;
+    }
+		try_files $uri $uri/ =404;
+	}
+}
+
+server {
+	listen 80;
+	listen [::]:80;
+
+	server_name example.com;
+  server_tokens off;
+  access_log /var/log/nginx/access.log Combined;
+  
+	root /var/www/goodbye_corona;
+	index index.php index.html;
+
+	location / {
+    limit_except GET POST {
+      deny all;
+    }
+		try_files $uri $uri/ =404;
+	}
+  
+	location ~ \.php$ {
+		include snippets/fastcgi-php.conf;
+	#
+	#	# With php-fpm (or other unix sockets):
+		fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+	#	# With php-cgi (or other tcp sockets):
+	#	fastcgi_pass 127.0.0.1:9000;
+	}
+  
+}
